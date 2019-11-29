@@ -1,0 +1,30 @@
+# Ignore project IDE files
+.idea
+.vscode
+
+# Ignore node_modules
+node_modules
+
+# Ignore Mac OS X files
+.DS_Store
+
+# Ignore local notes folder
+notes
+
+# Ignore local logs
+*.log
+*~
+
+dist
+
+docker/data/
+
+# Ignore config environment
+.env
+
+# Ignore secret files
+dev_secret_values.yaml
+prod_secret_values.yaml
+temp
+
+Temp.ts
