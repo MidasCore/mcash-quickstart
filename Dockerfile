@@ -23,13 +23,11 @@ WORKDIR /mcash/FullNode
 COPY bin/config-local.conf ./config.conf
 COPY bin/FullNode.jar .
 
-WORKDIR /mcash
-COPY scripts scripts
-RUN chmod +x scripts/generate_account
+COPY scripts /mcash/scripts
 
-COPY entrypoint.sh .
+COPY entrypoint.sh /
 
 EXPOSE 13399
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
