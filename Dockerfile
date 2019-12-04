@@ -15,6 +15,7 @@ WORKDIR /mcash/app
 # Install proxy dependencies
 COPY app/package.json .
 RUN npm install
+
 COPY app .
 RUN npm run build
 
@@ -25,9 +26,12 @@ COPY bin/FullNode.jar .
 
 COPY scripts /mcash/scripts
 
+VOLUME /mcash
+
 COPY entrypoint.sh /
 
 EXPOSE 13399
 
 ENTRYPOINT ["/entrypoint.sh"]
 
+CMD ["quickstart"]
