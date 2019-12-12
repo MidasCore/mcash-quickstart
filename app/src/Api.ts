@@ -5,6 +5,11 @@ import proxy from "http-proxy-middleware";
 import {adminRoute} from "./AdminRoutes";
 
 const _ = require('lodash');
+const cors = require('cors');
+
+process.on('uncaughtException', function (error) {
+  console.error(error.message)
+});
 
 const port = 13399;
 
@@ -25,20 +30,21 @@ export class Api {
         this.app.set("port", port);
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({extended: false}));
+        this.app.use(cors());
         const morgan = require('morgan');
         this.app.use(morgan('[:date[clf]] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms'));
-        this.app.use(function (req, res, next) {
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader(
-                'Access-Control-Allow-Methods',
-                'GET, POST'
-            );
-            res.setHeader(
-                'Access-Control-Allow-Headers',
-                'Access-Control-Allow-Headers, Origin, X-Requested-With, Content-Type, Accept, Authorization'
-            );
-            next();
-        });
+        // this.app.use(function (req, res, next) {
+        //     res.setHeader('Access-Control-Allow-Origin', '*');
+        //     res.setHeader(
+        //         'Access-Control-Allow-Methods',
+        //         'GET, POST'
+        //     );
+        //     res.setHeader(
+        //         'Access-Control-Allow-Headers',
+        //         'Access-Control-Allow-Headers, Origin, X-Requested-With, Content-Type, Accept, Authorization'
+        //     );
+        //     next();
+        // });
 
     }
 
@@ -47,8 +53,8 @@ export class Api {
         const conf = {
             changeOrigin: true,
             onProxyReq: this.onProxyReq,
-            onError: this.onError,
             onProxyRes: this.onProxyRes,
+            onError: this.onError,
         };
 
         this.app.use('/wallet', proxy({

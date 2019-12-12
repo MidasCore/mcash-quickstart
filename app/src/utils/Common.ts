@@ -12,6 +12,7 @@ export function sleep(millis) {
 }
 
 export async function generateAccounts(options) {
+    console.log(options);
     const tmpDir = '/mcash';
     const jsonPath = path.join(tmpDir, 'accounts.json');
 
@@ -38,8 +39,10 @@ export async function generateAccounts(options) {
         } else {
             accounts.more.push(newAccounts);
         }
-        fs.ensureDirSync(tmpDir);
-        fs.writeFileSync(path.join(tmpDir, 'accounts.json'), JSON.stringify(accounts, null, 2));
+        if (!options.addAccounts) {
+            fs.ensureDirSync(tmpDir);
+            fs.writeFileSync(path.join(tmpDir, 'accounts.json'), JSON.stringify(accounts, null, 2));
+        }
     }
 
     return accounts;
@@ -49,12 +52,11 @@ export async function generateAccounts(options) {
 async function deriveAccounts(options) {
 
     if (options.addAccounts) {
-        for (let key of 'mnemonic,hdPath,seed,useDefaultPrivateKey'.split(',')) {
+        for (let key of 'mnemonic,seed'.split(',')) {
             delete options[key];
         }
     }
-
-    const totalAccounts = options.accounts;
+    const totalAccounts = parseInt(options.accounts);
 
     const hdPath = options.hdPath;
 
@@ -76,16 +78,12 @@ async function deriveAccounts(options) {
     for (let i = 0; i < totalAccounts; i++) {
         let acct = wallet.derivePath(hdPath + i);
         let privateKey = acct.getWallet().getPrivateKey().toString('hex');
-        if (!i && options.useDefaultPrivateKey) {
-            privateKey = mcashWeb.defaultPrivateKey;
-        }
         privateKeys.push(privateKey);
     }
 
     return {
         hdPath,
         mnemonic,
-        usingDefaultPrivateKey: options.useDefaultPrivateKey,
         privateKeys
     };
 }

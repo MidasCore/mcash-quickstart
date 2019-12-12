@@ -4,9 +4,12 @@ import {Config} from "./Config";
 import {generateAccounts, verifyAccountsBalance} from "./utils/Common";
 import {mcashWeb} from "./utils/McashWeb";
 
+const _ = require('lodash');
+
 export const adminRoute = express.Router();
 
 let accounts;
+let testingAccounts;
 
 function logAccount(generatedAccounts, balances) {
     console.log(`hdPath: ${generatedAccounts.hdPath}`);
@@ -51,6 +54,7 @@ adminRoute.get('/accounts', async function (req: Request, res: Response) {
         let accountInfos = getAccountInfo(accounts, balances);
         console.log(accountInfos);
         res.status(200);
+        res.header("Content-Type", 'application/json');
         res.json({status: true, data: accountInfos});
     } catch (e) {
         res.status(400);
@@ -63,11 +67,45 @@ adminRoute.get('/generate', async function (req: Request, res: Response) {
     let options = Config.options;
     try {
         accounts = await generateAccounts(options);
+        testingAccounts = accounts;
         let balances = await verifyAccountsBalance(accounts, options.defaultBalance);
         let accountInfos = getAccountInfo(accounts, balances);
         console.log(accountInfos);
         res.status(200);
         res.json({status: true});
+    } catch (e) {
+        res.status(400);
+        console.error(e);
+        res.json({status: false, message: e});
+    }
+});
+
+adminRoute.get('/generate-testing', async function (req: Request, res: Response) {
+    let options = _.defaults(Config.options, req.query);
+    options.addAccounts = true;
+    try {
+        testingAccounts = await generateAccounts(options);
+        let balances = await verifyAccountsBalance(testingAccounts, options.defaultBalance);
+        let accountInfos = getAccountInfo(testingAccounts, balances);
+        console.log(accountInfos);
+        res.status(200);
+        res.json({status: true});
+    } catch (e) {
+        res.status (400);
+        console.error(e);
+        res.json({status: false, message: e});
+    }
+});
+
+adminRoute.get('/account-testing', async function (req: Request, res: Response) {
+    let options = Config.options;
+    try {
+        let balances = await verifyAccountsBalance(testingAccounts, options.defaultBalance);
+        let accountInfos = getAccountInfo(testingAccounts, balances);
+        console.log(accountInfos);
+        res.status(200);
+        res.header("Content-Type", 'application/json');
+        res.json({status: true, data: accountInfos});
     } catch (e) {
         res.status(400);
         console.error(e);
